@@ -52,7 +52,13 @@
                 }
             }, 2000);
         });
-
+    
+        eventVoteupdate: function (obj) {
+            if(basicBot.settings.mehSkip && API.getScore().negative >= basicBot.settings.mehSkipLimit) {
+            	API.sendChat("/me @" + API.getDJ().username + " your song received too many skips!");
+            	return API.moderateForceSkip();
+            }
+        }
 
         /*
          Extend the bot here, either by calling another function or here directly.
@@ -163,6 +169,8 @@
         filterChat: true,
         etaRestriction: true,
         welcome: false,
+        mehSkip: true,
+        mehSkipLimit: 7,
         opLink: null,
         rulesLink: null,
         themeLink: null,
