@@ -53,7 +53,7 @@
             }, 2000);
         });
     
-        eventVoteupdate: function (obj) {
+        API.on(API.VOTE_UPDATE, function () {
             if(basicBot.settings.mehSkip && API.getScore().negative >= basicBot.settings.mehSkipLimit) {
             	API.sendChat("/me @" + API.getDJ().username + " your song received too many skips!");
             	return API.moderateForceSkip();
