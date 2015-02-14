@@ -58,7 +58,7 @@
             	API.sendChat("/me @" + API.getDJ().username + " your song received too many skips!");
             	return API.moderateForceSkip();
             }
-        }
+        });
 
         /*
          Extend the bot here, either by calling another function or here directly.
