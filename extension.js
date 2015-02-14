@@ -9,9 +9,50 @@
 
         //Precaution to make sure it is assigned properly.
         var bot = window.bot;
+        var autoRoulette = true;
 
         //Load custom settings set below
         bot.retrieveSettings();
+        
+        setInterval(function () {
+            if(autoRoulette === true) {
+                API.sendChat("!roulette");
+            }
+        }, 1000 * 60 * 90);
+        
+        API.on(API.ADVANCE, function () {
+            var toggle = $(".cycle-toggle");
+            if(API.getWaitList().length > 16) {
+                if (!toggle.hasClass("disabled")) {
+                    toggle.click();
+                }
+            }
+            if(API.getWaitList().length < 12) {
+                if (toggle.hasClass("disabled")) {
+                    toggle.click();
+                }
+            }
+            
+            //Check song in history
+            setTimeout(function () {
+                var len = bot.room.historyList.length;
+                var temp = 0;
+                for(var i = 1; i <= 50; i++) {
+                    if((len - i - 1) < 0) {
+                        break;
+                    }
+                    else {
+                        temp = len - i - 1;
+                    }
+                    if(bot.room.historyList[temp][0] === API.getMedia().cid) {
+                        API.sendChat("/me " + API.getMedia().title + " was played too recently!");
+                        API.moderateForceSkip();
+                        break;
+                    }
+                }
+            }, 2000);
+        });
+
 
         /*
          Extend the bot here, either by calling another function or here directly.
@@ -44,6 +85,34 @@
                 }
             }
         };
+        
+        bot.commands.automateRoulette = {
+            command: ['aroulette', 'autoroulette'],
+            rank: 'manager',
+            type: 'exact',
+            functionality: function (chat, cmd) {
+                if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
+                if (!bot.commands.executable(this.rank, chat)) return void (0);
+                else {
+                    autoRoulette = !autoRoulette;
+                    API.sendChat("/me Roulette Automation set to " + autoRoulette);
+                }
+            }
+        };
+
+        bot.commands.meowCommand = {
+            command: 'meow',
+            rank: 'user',
+            type: 'exact',
+            functionality: function (chat, cmd) {
+                if (this.type === 'exact' && chat.message.length !== cmd.length) return void (0);
+                if (!bot.commands.executable(this.rank, chat)) return void (0);
+                else {
+                    var sounds = Array("Nya! :cirLove: ", "Nyah! :cirLewd: ", "Nyan! :cirGlod: ");
+                    API.sendChat("/me " + sounds[Math.floor(Math.random()*sounds.length)]);
+                }
+            }
+        };
 
         //Load the chat package again to account for any changes
         bot.loadChat();
@@ -53,27 +122,27 @@
     //Change the bots default settings and make sure they are loaded on launch
 
     localStorage.setItem("basicBotsettings", JSON.stringify({
-        botName: "basicBot",
+        botName: "Night-botX",
         language: "english",
         chatLink: "https://rawgit.com/Yemasthui/basicBot/master/lang/en.json",
         startupCap: 1, // 1-200
         startupVolume: 0, // 0-100
         startupEmoji: false, // true or false
-        maximumAfk: 120,
-        afkRemoval: true,
-        maximumDc: 60,
-        bouncerPlus: true,
+        maximumAfk: 240,
+        afkRemoval: false,
+        maximumDc: 20,
+        bouncerPlus: false,
         lockdownEnabled: false,
         lockGuard: false,
         maximumLocktime: 10,
-        cycleGuard: true,
+        cycleGuard: false,
         maximumCycletime: 10,
         voteSkip: false,
         voteSkipLimit: 10,
         timeGuard: true,
-        maximumSongLength: 10,
-        autodisable: true,
-        commandCooldown: 30,
+        maximumSongLength: 5.15,
+        autodisable: false,
+        commandCooldown: 10,
         usercommandsEnabled: true,
         lockskipPosition: 3,
         lockskipReasons: [
@@ -83,7 +152,8 @@
             ["mix", "You played a mix, which is against the rules. "],
             ["sound", "The song you played had bad sound quality or no sound. "],
             ["nsfw", "The song you contained was NSFW (image or sound). "],
-            ["unavailable", "The song you played was not available for some users. "]
+            ["unavailable", "The song you played was not available for some users. "],
+            ["length", "The song you played was too long. "]
         ],
         afkpositionCheck: 15,
         afkRankCheck: "ambassador",
@@ -91,21 +161,21 @@
         motdInterval: 5,
         motd: "Temporary Message of the Day",
         filterChat: true,
-        etaRestriction: false,
-        welcome: true,
+        etaRestriction: true,
+        welcome: false,
         opLink: null,
         rulesLink: null,
         themeLink: null,
         fbLink: null,
         youtubeLink: null,
-        website: null,
+        website: "http://nightcorefc.com",
         intervalMessages: [],
         messageInterval: 5,
-        songstats: true,
+        songstats: false,
         commandLiteral: "!",
         blacklists: {
-            NSFW: "https://rawgit.com/Yemasthui/basicBot-customization/master/blacklists/ExampleNSFWlist.json",
-            OP: "https://rawgit.com/Yemasthui/basicBot-customization/master/blacklists/ExampleOPlist.json"
+            NSFW: "https://rawgit.com/BrabbitX/basicBot-customization/master/blacklists/ExampleNSFWlist.json",
+            OP: "https://rawgit.com/BrabbitX/basicBot-customization/master/blacklists/ExampleOPlist.json"
         }
     }));
 
